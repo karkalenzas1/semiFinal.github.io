@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Manager</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">ackers<span class = "league">league</div>
+      <div class="nav-links">
+        <a href="index.html">News</a>
+        <a href="standings-user.html">Standings</a>
+        <a href="admin.html">Admin</a>
+      </div>
+    </header>
+    <div>
+      <h2>Admin Page</h2>
+      <form id="teamForm">
+        <label for="teamName">Team Name:</label>
+        <input type="text" id="teamName" required />
+        <label for="wins">Wins:</label>
+        <input type="number" id="wins" required />
+        <label for="losses">Losses:</label>
+        <input type="number" id="losses" required />
+        <button type="button" onclick="addOrUpdateTeam()">
+          Add/Update Team
+        </button>
+        <input type="hidden" id="editIndex" />
+      </form>
+    </div>
+
+    <div>
+      <h2>Team List</h2>
+      <table id="teamTable">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Team</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="teamTableBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      let teams = JSON.parse(localStorage.getItem("teams")) || [];
+
+      function addOrUpdateTeam() {
+        const teamName = document.getElementById("teamName").value;
+        const wins = parseInt(document.getElementById("wins").value);
+        const losses = parseInt(document.getElementById("losses").value);
+        const editIndex = document.getElementById("editIndex").value;
+
+        if (!teamName || isNaN(wins) || isNaN(losses)) {
+          alert("Please enter valid data.");
+          return;
+        }
+
+        if (editIndex === "") {
+          // Add new team
+          const team = { teamName, wins, losses };
+          teams.push(team);
+        } else {
+          // Update existing team
+          teams[editIndex].teamName = teamName;
+          teams[editIndex].wins = wins;
+          teams[editIndex].losses = losses;
+          document.getElementById("editIndex").value = "";
+        }
+
+        updateTeamList();
+        document.getElementById("teamForm").reset();
+        saveDataToLocalStorage();
+      }
+
+      function editTeam(index) {
+        document.getElementById("teamName").value = teams[index].teamName;
+        document.getElementById("wins").value = teams[index].wins;
+        document.getElementById("losses").value = teams[index].losses;
+        document.getElementById("editIndex").value = index;
+      }
+
+      function deleteTeam(index) {
+        teams.splice(index, 1);
+        updateTeamList();
+        saveDataToLocalStorage();
+      }
+
+      function updateTeamList() {
+        teams.sort((a, b) => b.wins - a.wins);
+
+        const tableBody = document.getElementById("teamTableBody");
+        tableBody.innerHTML = "";
+
+        teams.forEach((team, index) => {
+          const row = tableBody.insertRow();
+          const cell1 = row.insertCell(0);
+          const cell2 = row.insertCell(1);
+          const cell3 = row.insertCell(2);
+          const cell4 = row.insertCell(3);
+          const cell5 = row.insertCell(4);
+
+          cell1.textContent = index + 1; // Rank
+          cell2.textContent = team.teamName;
+          cell3.textContent = team.wins;
+          cell4.textContent = team.losses;
+
+          const editButton = document.createElement("button");
+          editButton.textContent = "Edit";
+          editButton.addEventListener("click", () => editTeam(index));
+
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Delete";
+          deleteButton.addEventListener("click", () => deleteTeam(index));
+
+          cell5.appendChild(editButton);
+          cell5.appendChild(deleteButton);
+        });
+      }
+
+      function saveDataToLocalStorage() {
+        localStorage.setItem("teams", JSON.stringify(teams));
+      }
+
+      // Initial data load
+      updateTeamList();
+    </script>
+  </body>
+</html>

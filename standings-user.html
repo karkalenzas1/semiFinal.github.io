@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Standings</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        
+      
+      table {
+        width: 500px;
+        border-collapse: collapse;
+        margin-left: auto;
+margin-right: auto;
+        
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        background-color: white;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .wins{
+        color: green;
+      }
+      .losses{
+        color:red;
+      }
+      .standingas {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+        <div class="logo">ackers<span class = "league">league</div>
+        <div class="nav-links">
+          <a href="index.html">News</a>
+          <a href="standings-user.html">Standings</a>
+          <a href="admin.html">Admin</a>
+        </div>
+      </header>
+    <div>
+      <h2 class="standingas">Standings</h2>
+      <table id="standingsTable">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Team</th>
+            <th class="wins">Wins</th>
+            <th class="losses">Losses</th>
+          </tr>
+        </thead>
+        <tbody id="standingsTableBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      // Load data from local storage
+      const teams = JSON.parse(localStorage.getItem("teams")) || [];
+
+      function updateStandingsTable() {
+        // Sort teams based on wins
+        teams.sort((a, b) => b.wins - a.wins);
+
+        const standingsTableBody =
+          document.getElementById("standingsTableBody");
+        standingsTableBody.innerHTML = "";
+
+        // Populate the standings table
+        teams.forEach((team, index) => {
+          const row = standingsTableBody.insertRow();
+          const cell1 = row.insertCell(0);
+          const cell2 = row.insertCell(1);
+          const cell3 = row.insertCell(2);
+          const cell4 = row.insertCell(3);
+
+          cell1.textContent = index + 1; // Rank
+          cell2.textContent = team.teamName;
+          cell3.textContent = team.wins;
+          cell4.textContent = team.losses;
+        });
+      }
+
+      // Initial data load
+      updateStandingsTable();
+    </script>
+  </body>
+</html>
